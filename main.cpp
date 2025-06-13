@@ -7,12 +7,21 @@ int main() {
     Tabela uva("uva.csv");
     Tabela pais("pais.csv");
 
+    // Primeiro teste: Vinho ⋈ Uva
     Operador op1(vinho, uva, "uva_id", "uva_id");
     op1.executar();
     std::cout << "[Vinho ⋈ Uva] Pags: " << op1.numPagsGeradas()
               << " IOs: " << op1.numIOExecutados()
               << " Tuplas: " << op1.numTuplasGeradas() << std::endl;
     op1.salvarTuplasGeradas("resultado_vinho_uva.csv");
+
+    // Segundo teste: Uva ⋈ Vinho (ordem inversa)
+    Operador op1_inverso(uva, vinho, "uva_id", "uva_id");
+    op1_inverso.executar();
+    std::cout << "[Uva ⋈ Vinho] Pags: " << op1_inverso.numPagsGeradas()
+              << " IOs: " << op1_inverso.numIOExecutados()
+              << " Tuplas: " << op1_inverso.numTuplasGeradas() << std::endl;
+    op1_inverso.salvarTuplasGeradas("resultado_uva_vinho.csv");
 
     Operador op2(vinho, pais, "pais_producao_id", "pais_id");
     op2.executar();
@@ -27,14 +36,6 @@ int main() {
               << " IOs: " << op3.numIOExecutados()
               << " Tuplas: " << op3.numTuplasGeradas() << std::endl;
     op3.salvarTuplasGeradas("resultado_uva_pais.csv");
-
-    // Teste de join que não deve retornar nenhuma tupla
-    Operador op4(vinho, pais, "uva_id", "pais_id");
-    op4.executar();
-    std::cout << "[Vinho ⋈ Pais (uva_id=pais_id)] Pags: " << op4.numPagsGeradas()
-              << " IOs: " << op4.numIOExecutados()
-              << " Tuplas: " << op4.numTuplasGeradas() << std::endl;
-    op4.salvarTuplasGeradas("resultado_vinho_pais_invalido.csv");
 
     return 0;
 }
