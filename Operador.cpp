@@ -10,6 +10,14 @@
 
 Operador::Operador(Tabela t1, Tabela t2, std::string col1, std::string col2)
     : t1(t1), t2(t2), col1(col1), col2(col2) {
+    // Verifica compatibilidade das colunas
+    sgbd::TipoColuna tipo1 = t1.getTipoColuna(col1);
+    sgbd::TipoColuna tipo2 = t2.getTipoColuna(col2);
+    
+    if (tipo1 != tipo2) {
+        throw std::runtime_error("Colunas incompatíveis para join: " + col1 + " e " + col2);
+    }
+
     int idx1 = t1.getIndiceColuna(col1);
     int idx2 = t2.getIndiceColuna(col2);
     std::cout << "Ordenando tabela " << t1.nomeArquivo << " pela coluna " << col1 << std::endl;
@@ -45,7 +53,12 @@ void Operador::executar() {
         if (buffer1.size() >= PAGE_SIZE * 2) return;  // Buffer cheio
         while (buffer1.size() < PAGE_SIZE * 2 && has1) {
             if (std::getline(f1, linha1)) {
-                buffer1.emplace_back(linha1);
+                buffer1.emplace_back(linha1, std::vector<sgbd::TipoColuna>{
+                    sgbd::TipoColuna::ID_UVA,
+                    sgbd::TipoColuna::ID_PAIS_PRODUCAO,
+                    sgbd::TipoColuna::NOME,
+                    sgbd::TipoColuna::DESCRICAO
+                });
                 totalTuplas1++;
             } else {
                 has1 = false;
@@ -59,7 +72,12 @@ void Operador::executar() {
         if (buffer2.size() >= PAGE_SIZE) return;  // Buffer cheio
         while (buffer2.size() < PAGE_SIZE && has2) {
             if (std::getline(f2, linha2)) {
-                buffer2.emplace_back(linha2);
+                buffer2.emplace_back(linha2, std::vector<sgbd::TipoColuna>{
+                    sgbd::TipoColuna::ID_UVA,
+                    sgbd::TipoColuna::ID_PAIS_ORIGEM,
+                    sgbd::TipoColuna::NOME,
+                    sgbd::TipoColuna::DESCRICAO
+                });
                 totalTuplas2++;
             } else {
                 has2 = false;
@@ -199,6 +217,7 @@ void Operador::executar() {
         io_count++;  // Escrita de página
     }
 
+    // Imprimir estatísticas
     std::cout << "Estatísticas da junção:" << std::endl;
     std::cout << "Total de tuplas na tabela 1: " << totalTuplas1 << std::endl;
     std::cout << "Total de tuplas na tabela 2: " << totalTuplas2 << std::endl;
@@ -223,9 +242,25 @@ int Operador::numPagsGeradas() const {
     return pag_count;
 }
 
-void Operador::salvarTuplasGeradas(const std::string& arquivoSaida) const {
+void Operador::salvarTuplasGeradas(const std::string& arquivoSaida) {
     std::ofstream out(arquivoSaida);
-    for (const auto& p : paginasResultado) {
-        out << p.serializar();
+    if (!out.is_open()) {
+        throw std::runtime_error("Erro ao abrir arquivo para escrita: " + arquivoSaida);
+    }
+
+    // Escreve o cabeçalho
+    for (const auto& col : t1.colunas) {
+        out << col.getNome() << ",";
+    }
+    for (const auto& col : t2.colunas) {
+        out << col.getNome() << ",";
+    }
+    out << std::endl;
+
+    // Escreve as tuplas
+    for (const auto& pagina : paginasResultado) {
+        for (const auto& tupla : pagina.tuplas) {
+            out << tupla.serializar() << std::endl;
+        }
     }
 }
