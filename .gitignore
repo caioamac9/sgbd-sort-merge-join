@@ -1,0 +1,40 @@
+# Arquivos compilados
+*.o
+*.obj
+*.exe
+*.out
+*.app
+sort_merge_join
+
+# Arquivos de build
+build/
+bin/
+lib/
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de debug
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Arquivos de cache
+*.cache
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Arquivos de dados gerados
+sorted_*
+resultado_* 
