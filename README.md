@@ -53,9 +53,8 @@ g++ -std=c++17 *.cpp -o sort_merge_join
 - Arquivos de entrada/saída em formato texto
 
 ## Autor
-
-[Seu Nome]
-
+Caioamac terror dos esmeralda
+Luis Antonio ak cruzada
 ## Licença
 
 Este projeto está sob a licença MIT. 
